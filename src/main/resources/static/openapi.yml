@@ -1,0 +1,445 @@
+  openapi: '3.0.3'
+  info:
+    title: Event Management API
+    version: 1.0.0
+    description: >-
+      API for event management
+  tags:
+    - name: Event Service
+    - name: User Service
+  paths:
+    /user:
+      post:
+        operationId: addUser
+        tags:
+          - User Service
+        summary: Create the user
+        description: Creates the user
+        requestBody:
+          description: User data
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreateRequest'
+        responses:
+          '201':
+            description: Created
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/UserResponse'
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: Not Authorized
+          '403':
+            description: Access Denied
+          '422':
+            description: Unprocessable Entity
+    /user/{userId}:
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      get:
+        operationId: findByUserId
+        tags:
+          - User Service
+        summary: Search the user
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/UserResponse'
+          '400':
+            description: "Bad Request"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: Not Authorized
+          '403':
+            description: Access Denied
+          '404':
+            description: Not found
+          '422':
+            description: Unprocessable Entity
+      put:
+        operationId: updateByUserId
+        tags:
+          - User Service
+        summary: Update User
+        requestBody:
+          description: User data
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreateRequest'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/UserResponse'
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: Not Authorized
+          '403':
+            description: Access Denied
+          '404':
+            description: Not found
+          '422':
+            description: Unprocessable Entity
+      delete:
+        operationId: deleteUser
+        tags:
+          - User Service
+        summary: delete user
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/DeleteResponse'
+          '400':
+            description: "Bad Request"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: Not Authorized
+          '403':
+            description: Access Denied
+          '404':
+            description: Not found
+          '422':
+            description: Unprocessable Entity
+    /event:
+      post:
+        operationId: addEvent
+        tags:
+          - Event Service
+        summary: Create the Event
+        description: Creates the Event
+        requestBody:
+          description: Event data
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventCreateRequest'
+        responses:
+          '201':
+            description: Created
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/EventResponse'
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: Not Authorized
+          '403':
+            description: Access Denied
+          '422':
+            description: Unprocessable Entity
+    /event/{eventId}:
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      put:
+        operationId: updateUser
+        tags:
+          - Event Service
+        summary: Update User
+        requestBody:
+          description: User data
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventCreateRequest'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/EventResponse'
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: Not Authorized
+          '403':
+            description: Access Denied
+          '404':
+            description: Not found
+          '422':
+            description: Unprocessable Entity
+      get:
+        operationId: findEventById
+        tags:
+          - Event Service
+        summary: Search event
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/EventResponse'
+          '400':
+            description: "Bad Request"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: Not Authorized
+          '403':
+            description: Access Denied
+          '404':
+            description: Not found
+          '422':
+            description: Unprocessable Entity
+      delete:
+        operationId: deleteEvent
+        tags:
+          - Event Service
+        summary: delete event
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/DeleteResponse'
+          '400':
+            description: "Bad Request"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: Not Authorized
+          '403':
+            description: Access Denied
+          '404':
+            description: Not found
+          '422':
+            description: Unprocessable Entity
+    /event/addUser/{eventId}:
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      put:
+        operationId: addUserEvent
+        tags:
+          - Event Service
+        summary: Add User to Event
+        requestBody:
+          description: Add user to event
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventAddUserRequest'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/EventAddUserResponse'
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: Not Authorized
+          '403':
+            description: Access Denied
+          '404':
+            description: Not found
+          '422':
+            description: Unprocessable Entity
+  components:
+    schemas:
+      UserCreateRequest:
+        type: object
+        properties:
+          name:
+            type: string
+            minLength: 2
+            maxLength: 100
+            description: user name
+            example: John Doe
+          email:
+            type: string
+            description: user email
+            example: john.doe@gmail.com
+          cpf:
+            type: string
+            description: user CPF
+            example: 502.914.848-59
+        required:
+          - name
+          - email
+          - cpf
+      UserResponse:
+        type: object
+        properties:
+          id:
+            type: string
+            description: internal unique id created in boarding
+            example: B462F924-C80C-44D5-A2F9-A597EE63E8RI
+          name:
+            type: string
+            minLength: 2
+            maxLength: 100
+            description: User Name
+            example: John Doe
+          email:
+            type: string
+            description: user email
+            example: john.doe@gmail.com
+          cpf:
+            type: string
+            description: user CPF
+            example: 502.914.848-59
+          createAt:
+            type: string
+            format: date-time
+            description: date and time the record was created, in UTC standard
+            example: '2023-01-01T18:00:01Z'
+      DeleteResponse:
+        type: object
+        properties:
+          deletedAt:
+            type: string
+            format: date-time
+            description: date and time the record was deleted, in UTC standard
+            example: '2023-01-01T18:00:01Z'
+          message:
+            type: string
+
+      EventCreateRequest:
+        type: object
+        properties:
+          ownerId:
+            type: string
+            format: uuid
+          eventName:
+            type: string
+            example: Java Event
+          date:
+            type: string
+            format: date
+            example: 2027-07-21
+          time:
+            type: string
+          participantsLimit:
+            type: integer
+        required:
+          - ownerId
+          - eventName
+          - date
+          - participantsLimit
+      EventResponse:
+        type: object
+        properties:
+          eventId:
+            type: string
+            format: uuid
+          ownerId:
+            type: string
+            format: uuid
+          eventName:
+            type: string
+            example: Java Event
+          date:
+            type: string
+            format: date
+            example: 2017-07-21
+          time:
+            type: string
+          participantsLimit:
+            type: integer
+          createdAt:
+            type: string
+            format: date-time
+            description: date and time the record was created, in UTC standard
+            example: '2023-01-01T18:00:01Z'
+      EventAddUserRequest:
+        type: object
+        properties:
+          cpf:
+            type: string
+      EventAddUserResponse:
+        type: object
+        properties:
+          addedAt:
+            type: string
+            format: date-time
+            description: date and time the record was deleted, in UTC standard
+            example: '2023-01-01T18:00:01Z'
+          message:
+            type: string
+
+      ErrorResponse:
+        type: object
+        properties:
+          code:
+            type: string
+            description: Error response code, related to the business
+            example: error
+          message:
+            type: string
+            description: Error response message, related to the business.
+            example: Error response message, related to the business, validation, or generic errors
+          details:
+            type: array
+            items:
+              type: string
+            description: Errors Validation
+            example: [ 'name: not null' ]
+          releaseAt:
+            type: string
+            format: date-time
+            description: Date and time error
+            example: '2023-01-01T18:00:01Z'
