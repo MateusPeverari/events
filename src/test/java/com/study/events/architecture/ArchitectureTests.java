@@ -1,11 +1,13 @@
 package com.study.events.architecture;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.study.events.infrastructure.adapters.outbound.persistence.entity.AuditingEntity;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.JavaMember;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.BeforeAll;
@@ -71,8 +73,27 @@ public class ArchitectureTests {
   @Test
   void testEntities() {
     ArchRule entitiesRule = classes().that().resideInAPackage("..entity").should().beAssignableTo(
-        AuditingEntity.class );
+        AuditingEntity.class);
     entitiesRule.check(classes);
+  }
+
+  @Test
+  void testFieldsDomain() {
+    ArchRule fieldsRule =
+        fields().that().areDeclaredInClassesThat().areNotEnums().and(
+                JavaMember.Predicates.declaredIn(JavaClass.Predicates.resideInAnyPackage("..domain..")))
+            .should()
+            .bePrivate().because(" it is standard");
+    fieldsRule.check(classes);
+  }
+
+  @Test
+  void testFieldsService() {
+    ArchRule fieldsRule =
+        fields().that().areDeclaredInClassesThat().resideInAPackage("..service..")
+            .should()
+            .bePrivate().andShould().beFinal().because(" it is standard");
+    fieldsRule.check(classes);
   }
 
   private void checkNoDependencyFromTo(
