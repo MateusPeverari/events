@@ -9,7 +9,6 @@ import com.study.events.domain.exception.UserErrors;
 import com.study.events.domain.exception.UserException;
 import com.study.events.domain.model.Event;
 import com.study.events.infrastructure.adapters.data.EventAddUserRequest;
-import com.study.events.infrastructure.adapters.outbound.persistence.UserPersistenceAdapter;
 import com.study.events.infrastructure.adapters.outbound.persistence.mappers.UserPersistenceMapper;
 import java.sql.Date;
 import java.sql.Time;

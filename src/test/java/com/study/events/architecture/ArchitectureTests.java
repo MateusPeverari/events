@@ -22,22 +22,16 @@ public class ArchitectureTests {
 
   @BeforeAll
   public static void setup() {
-    classes = new ClassFileImporter().importPackages("com.study.events");
+    classes = new ClassFileImporter().importPackages(ROOT_PACKAGE);
   }
 
   @Test
   void testDependenciesModel() {
-    var importPackage = ROOT_PACKAGE + "..";
-    classes = new ClassFileImporter().importPackages(importPackage);
-
     checkNoDependencyFromTo(MODEL_PACKAGE, ROOT_PACKAGE, classes);
   }
 
   @Test
   void testAccessDependenciesService() {
-    var importPackage = ROOT_PACKAGE + "..";
-    classes = new ClassFileImporter().importPackages(importPackage);
-
     checkNoAccessFromTo(SERVICE_PACKAGE, ADAPTERS_PACKAGE, classes);
     checkNoDependencyFromTo(SERVICE_PACKAGE, ADAPTERS_PACKAGE, classes);
   }
@@ -75,7 +69,7 @@ public class ArchitectureTests {
   }
 
   @Test
-  void testEntitites() {
+  void testEntities() {
     ArchRule entitiesRule = classes().that().resideInAPackage("..entity").should().beAssignableTo(
         AuditingEntity.class );
     entitiesRule.check(classes);
