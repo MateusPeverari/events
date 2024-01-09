@@ -76,13 +76,15 @@ public class EventService implements EventInputPort {
     eventPersistencePort.delete(eventId);
   }
 
+
+  //TODO ADD VALIDATION TO REMOVE USER IF IT`S IS ALREADY SIGNED UP
   @Override
   public void addUserToEvent(String eventId, EventAddUserRequest eventAddUserRequest) {
     log.info("Adding user " + eventAddUserRequest + " to event" + eventId);
 
     var event = findById(eventId);
     if (event.getAttendees() == event.getParticipantsLimit()) {
-      throw new EventException(EventErrors.PARTICIPANTS_LIMIT);
+      throw new EventException(EventErrors.EXCEEDED_PARTICIPANTS_LIMIT);
     }
 
     var userOptional = userPersistencePort.findByCpf(eventAddUserRequest.getCpf());
