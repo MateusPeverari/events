@@ -3,13 +3,19 @@ package com.study.events.architecture;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.library.GeneralCodingRules.NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS;
 
 import com.study.events.infrastructure.adapters.outbound.persistence.entity.AuditingEntity;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaMember;
+import com.tngtech.archunit.core.domain.JavaPackage;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;
+import com.tngtech.archunit.library.metrics.ArchitectureMetrics;
+import com.tngtech.archunit.library.metrics.LakosMetrics;
+import com.tngtech.archunit.library.metrics.MetricsComponents;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -47,6 +53,14 @@ public class ArchitectureTests {
   }
 
   @Test
+  void testControllerNameRules() {
+    ArchRule servicePackageRule = classes()
+        .that().resideInAPackage("..rest..")
+        .should().haveNameMatching(".*Controller");
+    servicePackageRule.check(classes);
+  }
+
+  @Test
   void testRepositoryTypeRules() {
     ArchRule servicePackageRule = classes()
         .that().resideInAPackage("..repository..")
@@ -59,6 +73,14 @@ public class ArchitectureTests {
     ArchRule servicePackageRule = classes()
         .that().resideInAPackage("..persistence")
         .should().implement(JavaClass.Predicates.resideInAPackage("..outbound.."));
+    servicePackageRule.check(classes);
+  }
+
+  @Test
+  void testControllerImpl() {
+    ArchRule servicePackageRule = classes()
+        .that().resideInAPackage("..rest")
+        .should().implement(JavaClass.Predicates.resideInAPackage("..adapters.."));
     servicePackageRule.check(classes);
   }
 
@@ -94,6 +116,20 @@ public class ArchitectureTests {
             .should()
             .bePrivate().andShould().beFinal().because(" it is standard");
     fieldsRule.check(classes);
+  }
+
+  @Test
+  void metrics() {
+
+    Set<JavaPackage> packages = classes.getPackage("com.study.events").getSubpackages();
+
+    MetricsComponents<JavaClass> components = MetricsComponents.fromPackages(packages);
+
+    LakosMetrics metrics = ArchitectureMetrics.lakosMetrics(components);
+    System.out.println("CCD: " + metrics.getCumulativeComponentDependency());
+    System.out.println("ACD: " + metrics.getAverageComponentDependency());
+    System.out.println("RACD: " + metrics.getRelativeAverageComponentDependency());
+    System.out.println("NCCD: " + metrics.getNormalizedCumulativeComponentDependency());
   }
 
   private void checkNoDependencyFromTo(
