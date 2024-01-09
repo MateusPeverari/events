@@ -103,9 +103,9 @@ public class EventService implements EventInputPort {
   private void validateEvent(Event event) {
     log.info("Validating event: {}", event);
 
-    validateParticipants(event);
     validateDate(event);
     validateTime(event);
+    validateParticipants(event);
   }
 
   private void validateTime(Event event) {

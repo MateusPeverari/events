@@ -2,17 +2,14 @@ package com.study.events.infrastructure.adapters.outbound.exception;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import com.study.events.domain.exception.EventException;
 import com.study.events.domain.exception.GenericErrors;
 import com.study.events.domain.exception.UserException;
 import com.study.events.infrastructure.adapters.data.ErrorResponse;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

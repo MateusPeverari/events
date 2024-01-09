@@ -29,7 +29,8 @@ public class BeanConfiguration {
   }
 
   @Bean
-  public UserPersistenceAdapter userPersistenceAdapter(UserRepository userRepository, UserPersistenceMapper userPersistenceMapper) {
+  public UserPersistenceAdapter userPersistenceAdapter(UserRepository userRepository,
+                                                       UserPersistenceMapper userPersistenceMapper) {
     return new UserPersistenceAdapter(userRepository, userPersistenceMapper);
   }
 

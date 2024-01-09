@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class EventException extends RuntimeException {
-  private EventErrors eventErrors;
+  private final EventErrors eventErrors;
 
   public EventException(EventErrors errors) {
     this.eventErrors = errors;

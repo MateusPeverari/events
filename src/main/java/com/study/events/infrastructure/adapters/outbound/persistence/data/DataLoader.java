@@ -23,10 +23,10 @@ public class DataLoader {
 
   @PostConstruct
   public void loadData() {
-    var user = new UserEntity(UUID.fromString("e2ca143a-f1f5-4d0c-aad0-230170a5474f"), "Mateus", "mateus@gmail.com", "502.914.848-59");
+    var user = new UserEntity(UUID.fromString("e2ca143a-f1f5-4d0c-aad0-230170a5474f"), "Mateus",
+        "mateus@gmail.com", "502.914.848-59");
 
     userRepository.save(user);
-
 
 
     //eventRepository.save(event);
