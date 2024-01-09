@@ -76,16 +76,13 @@ public class EventService implements EventInputPort {
     eventPersistencePort.delete(eventId);
   }
 
-
-  //TODO ADD VALIDATION TO REMOVE USER IF IT`S IS ALREADY SIGNED UP
   @Override
-  public void addUserToEvent(String eventId, EventAddUserRequest eventAddUserRequest) {
+  public int addUserToEvent(String eventId, EventAddUserRequest eventAddUserRequest) {
     log.info("Adding user " + eventAddUserRequest + " to event" + eventId);
 
     var event = findById(eventId);
-    if (event.getAttendees() == event.getParticipantsLimit()) {
-      throw new EventException(EventErrors.EXCEEDED_PARTICIPANTS_LIMIT);
-    }
+
+    var alreadySignedUp = validateUserAlreadySignedUp(event, eventAddUserRequest.getCpf());
 
     var userOptional = userPersistencePort.findByCpf(eventAddUserRequest.getCpf());
 
@@ -93,13 +90,31 @@ public class EventService implements EventInputPort {
       throw new UserException(UserErrors.USER_NOT_FOUND);
     }
 
-    var user = userOptional.get();
+    var userEntity = userPersistenceMapper.toUserEntity(userOptional.get());
+
+    if (alreadySignedUp) {
+      event.setAttendees(event.getAttendees() - 1);
+      var attendeesList = event.getAttendeesList();
+      attendeesList.remove(userEntity);
+      eventPersistencePort.update(event, eventId);
+      return 0;
+    }
+
+    if (event.getAttendees() == event.getParticipantsLimit()) {
+      throw new EventException(EventErrors.EXCEEDED_PARTICIPANTS_LIMIT);
+    }
 
     event.setAttendees(event.getAttendees() + 1);
     var attendeesList = event.getAttendeesList();
-    attendeesList.add(user);
+    attendeesList.add(userEntity);
 
     eventPersistencePort.update(event, eventId);
+    return 1;
+  }
+
+  private boolean validateUserAlreadySignedUp(Event event, String cpf) {
+    var participant = event.getAttendeesList().stream().filter(i -> i.getCPF().equals(cpf)).count();
+    return participant > 0;
   }
 
   private void validateEvent(Event event) {

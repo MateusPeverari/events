@@ -17,7 +17,7 @@ public class Event {
   private String eventTime;
   private int participantsLimit;
   private int attendees;
-  private List<User> attendeesList;
+  private List<UserEntity> attendeesList;
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;
 }

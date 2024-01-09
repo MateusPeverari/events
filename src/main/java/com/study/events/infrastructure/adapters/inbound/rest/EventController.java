@@ -70,12 +70,15 @@ public class EventController implements EventApi {
   public ResponseEntity<EventAddUserResponse> addUserEvent(String eventId,
                                                            EventAddUserRequest eventAddUserRequest) {
     log.info("Add user to event with id: ", eventId);
-    eventInputPort.addUserToEvent(eventId, eventAddUserRequest);
+    var result = eventInputPort.addUserToEvent(eventId, eventAddUserRequest);
 
     var userAdd = new EventAddUserResponse();
     userAdd.setAddedAt(LocalDateTime.now());
-    userAdd.setMessage("User " + eventAddUserRequest.getCpf() + " added to event: " + eventId);
-
+    if (result > 0) {
+      userAdd.setMessage("User " + eventAddUserRequest.getCpf() + " was added to event: " + eventId);
+    } else {
+      userAdd.setMessage("User " + eventAddUserRequest.getCpf() + " was already signed up to the event: " + eventId + ". The user has now been removed.");
+    }
     return ResponseEntity.ok(userAdd);
   }
 }

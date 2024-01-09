@@ -22,7 +22,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 
 @Data
-//@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity

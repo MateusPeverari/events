@@ -118,6 +118,15 @@ public class ArchitectureTests {
     fieldsRule.check(classes);
   }
 
+  //TODO FIX
+  /*
+  @Test
+  void testGenericExceptions() {
+    NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS.check(classes);
+  }
+
+   */
+
   @Test
   void metrics() {
 

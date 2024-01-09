@@ -12,5 +12,5 @@ public interface EventInputPort {
 
   void deleteEvent(String eventId);
 
-  void addUserToEvent(String eventId, EventAddUserRequest eventAddUserRequest);
+  int addUserToEvent(String eventId, EventAddUserRequest eventAddUserRequest);
 }

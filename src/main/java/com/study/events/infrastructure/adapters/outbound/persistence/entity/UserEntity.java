@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.br.CPF;
 
 @Data
-//@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
