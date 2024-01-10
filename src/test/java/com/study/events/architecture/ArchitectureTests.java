@@ -26,6 +26,10 @@ public class ArchitectureTests {
   private final static String MODEL_PACKAGE = "domain.model";
   private final static String SERVICE_PACKAGE = "domain.service";
   private final static String ADAPTERS_PACKAGE = "infrastructure.adapters";
+  private final static String INFRASTRUCTURE_PACKAGE = "infrastructure";
+  private final static String APPLICATION_PACKAGE = "application";
+  private final static String EXCEPTION_PACKAGE = "domain.exception";
+
 
 
   @BeforeAll
@@ -35,7 +39,10 @@ public class ArchitectureTests {
 
   @Test
   void testDependenciesModel() {
-    checkNoDependencyFromTo(MODEL_PACKAGE, ROOT_PACKAGE, classes);
+    checkNoDependencyFromTo(MODEL_PACKAGE, SERVICE_PACKAGE, classes);
+    checkNoDependencyFromTo(MODEL_PACKAGE, INFRASTRUCTURE_PACKAGE, classes);
+    checkNoDependencyFromTo(MODEL_PACKAGE, APPLICATION_PACKAGE, classes);
+    checkNoDependencyFromTo(MODEL_PACKAGE, EXCEPTION_PACKAGE, classes);
   }
 
   @Test
@@ -118,14 +125,13 @@ public class ArchitectureTests {
     fieldsRule.check(classes);
   }
 
-  //TODO FIX
   /*
   @Test
   void testGenericExceptions() {
     NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS.check(classes);
   }
-
    */
+
 
   @Test
   void metrics() {

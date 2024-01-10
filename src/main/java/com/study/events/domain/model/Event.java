@@ -1,5 +1,6 @@
 package com.study.events.domain.model;
 
+import com.study.events.domain.service.EventService;
 import com.study.events.infrastructure.adapters.outbound.persistence.entity.UserEntity;
 import java.time.LocalDateTime;
 import java.util.Date;
