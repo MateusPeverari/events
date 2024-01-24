@@ -14,6 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.togglz.core.Feature;
+import org.togglz.core.manager.FeatureManager;
+import org.togglz.core.util.NamedFeature;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventController implements EventApi {
   private final EventRestMapper eventRestMapper;
   private final EventInputPort eventInputPort;
+  private final FeatureManager featureManager;
+  public static final Feature TESTE = new NamedFeature("TESTE");
 
   @Override
   public ResponseEntity<EventResponse> addEvent(EventCreateRequest eventCreateRequest) {
@@ -29,6 +34,12 @@ public class EventController implements EventApi {
     var eventCreated = eventInputPort.createEvent(eventRestMapper.toEvent(eventCreateRequest));
     var eventResponse = eventRestMapper.toEventResponse(eventCreated);
     eventResponse.setOwnerId(eventCreateRequest.getOwnerId());
+
+    if (featureManager.isActive(TESTE)) {
+      log.info("FEATURE FLAG ON");
+    } else {
+      log.info("FEATURE FLAG OFF");
+    }
 
     log.info("Event created, sending response: {}", eventResponse);
     return ResponseEntity.status(HttpStatus.CREATED).body(eventResponse);
