@@ -406,6 +406,8 @@
             format: date-time
             description: date and time the record was created, in UTC standard
             example: '2023-01-01T18:00:01Z'
+          featureFlag:
+            type: string
       EventAddUserRequest:
         type: object
         properties:
