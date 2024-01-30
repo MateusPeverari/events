@@ -36,9 +36,9 @@ public class EventController implements EventApi {
     eventResponse.setOwnerId(eventCreateRequest.getOwnerId());
 
     if (featureManager.isActive(TESTE)) {
-      log.info("FEATURE FLAG ON");
+      eventResponse.setFeatureFlag("ON");
     } else {
-      log.info("FEATURE FLAG OFF");
+      eventResponse.setFeatureFlag("OFF");
     }
 
     log.info("Event created, sending response: {}", eventResponse);
