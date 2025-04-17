@@ -9,6 +9,7 @@ import com.study.events.infrastructure.adapters.data.EventCreateRequest;
 import com.study.events.infrastructure.adapters.data.EventResponse;
 import com.study.events.infrastructure.adapters.inbound.mappers.EventRestMapper;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,10 @@ public class EventController implements EventApi {
   public ResponseEntity<EventResponse> addEvent(EventCreateRequest eventCreateRequest) {
     log.info("Request to create event: {}", eventCreateRequest);
 
-    var eventCreated = eventInputPort.createEvent(eventRestMapper.toEvent(eventCreateRequest));
+    var event = eventRestMapper.toEvent(eventCreateRequest);
+    event.setId(UUID.randomUUID());
+
+    var eventCreated = eventInputPort.createEvent(event);
     var eventResponse = eventRestMapper.toEventResponse(eventCreated);
     eventResponse.setOwnerId(eventCreateRequest.getOwnerId());
 
