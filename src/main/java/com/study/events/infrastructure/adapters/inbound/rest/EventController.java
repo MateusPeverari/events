@@ -28,7 +28,6 @@ public class EventController implements EventApi {
     log.info("Request to create event: {}", eventCreateRequest);
 
     var event = eventRestMapper.toEvent(eventCreateRequest);
-    event.setId(UUID.randomUUID());
 
     var eventCreated = eventInputPort.createEvent(event);
     var eventResponse = eventRestMapper.toEventResponse(eventCreated);
@@ -47,7 +46,7 @@ public class EventController implements EventApi {
     var eventResponse = eventRestMapper.toEventResponse(eventUpdated);
     eventResponse.setOwnerId(eventCreateRequest.getOwnerId());
     log.info("Event updated, sending response: {}", eventResponse);
-    return ResponseEntity.status(HttpStatus.CREATED).body(eventResponse);
+    return ResponseEntity.status(HttpStatus.OK).body(eventResponse);
   }
 
   @Override
