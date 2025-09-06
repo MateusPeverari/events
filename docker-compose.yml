@@ -2,6 +2,7 @@ version: '3.8'
 services:
   db:
     image: postgres:16
+    command: ["-c", "config_file=/etc/postgresql/postgresql.conf"]
     environment:
       POSTGRES_DB: events_db
       POSTGRES_USER: events_user
@@ -10,6 +11,21 @@ services:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
+    tmpfs:
+      - /var/lib/postgresql/data/pg_stat_tmp
+      - /var/lib/postgresql/data/pg_wal
+    cpus: "2"
+    mem_limit: "12g"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    sysctls:
+      net.core.somaxconn: "4096"
+      net.ipv4.tcp_tw_reuse: "1"
+    networks:
+      - backend
   app:
     build: .
     ports:
@@ -20,6 +36,17 @@ services:
       SPRING_DATASOURCE_PASSWORD: events_pass
     depends_on:
       - db
+    cpus: "2"
+    mem_limit: "10g"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    sysctls:
+      net.core.somaxconn: "4096"
+      net.ipv4.tcp_tw_reuse: "1"
+    networks:
+      - backend
   prometheus:
     image: prom/prometheus:v2.44.0
     container_name: prometheus
@@ -27,6 +54,8 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - backend
   grafana:
     image: grafana/grafana:9.5.2
     container_name: grafana
@@ -37,5 +66,10 @@ services:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     depends_on:
       - prometheus
+    networks:
+      - backend
 volumes:
   postgres-data:
+networks:
+  backend:
+    driver: bridge
