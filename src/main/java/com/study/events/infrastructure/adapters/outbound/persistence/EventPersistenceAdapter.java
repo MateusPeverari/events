@@ -21,7 +21,7 @@ public class EventPersistenceAdapter implements EventPersistencePort {
   public Event save(Event event) {
     var eventEntity = eventPersistenceMapper.toEventEntity(event);
     eventEntity.setOwner(event.getOwner());
-    eventEntity = eventRepository.save(eventEntity);
+    eventEntity = eventRepository.saveAndFlush(eventEntity);
     return eventPersistenceMapper.toEvent(eventEntity);
   }
 
@@ -41,7 +41,7 @@ public class EventPersistenceAdapter implements EventPersistencePort {
 
       event.setId(eventSaved.getId());
       var eventEntity = eventPersistenceMapper.toEventEntity(event);
-      eventEntity = eventRepository.save(eventEntity);
+      eventEntity = eventRepository.saveAndFlush(eventEntity);
 
       return eventPersistenceMapper.toEvent(eventEntity);
     } else {
@@ -58,5 +58,6 @@ public class EventPersistenceAdapter implements EventPersistencePort {
     var eventSaved = eventSavedOptional.get();
     var eventEntity = eventPersistenceMapper.toEventEntity(eventSaved);
     eventRepository.delete(eventEntity);
+    eventRepository.flush();
   }
 }

@@ -21,7 +21,7 @@ public class UserPersistenceAdapter implements UserPersistencePort {
 
   @Override
   public User save(User user) {
-    var userEntity = userRepository.save(userPersistenceMapper.toUserEntity(user));
+    var userEntity = userRepository.saveAndFlush(userPersistenceMapper.toUserEntity(user));
     return userPersistenceMapper.toUser(userEntity);
   }
 
@@ -38,7 +38,7 @@ public class UserPersistenceAdapter implements UserPersistencePort {
     if (userSavedOptional.isPresent()) {
       var userSaved = userSavedOptional.get();
       user.setId(userSaved.getId());
-      var userEntity = userRepository.save(userPersistenceMapper.toUserEntity(user));
+      var userEntity = userRepository.saveAndFlush(userPersistenceMapper.toUserEntity(user));
       return userPersistenceMapper.toUser(userEntity);
     } else {
       throw new UserException(UserErrors.USER_NOT_FOUND);
@@ -48,6 +48,7 @@ public class UserPersistenceAdapter implements UserPersistencePort {
   @Override
   public void deleteUser(User user) {
     userRepository.delete(userPersistenceMapper.toUserEntity(user));
+    userRepository.flush();
   }
 
   @Override
