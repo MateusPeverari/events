@@ -1,6 +1,5 @@
 package com.study.events.domain.service;
 
-import br.com.pluxee.mbp.audit.domain.model.AuditAnnotation;
 import com.study.events.application.ports.inbound.EventInputPort;
 import com.study.events.application.ports.outbound.EventPersistencePort;
 import com.study.events.application.ports.outbound.UserPersistencePort;
@@ -17,17 +16,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 @Slf4j
-@Service
 @AllArgsConstructor
 public class EventService implements EventInputPort {
   private final EventPersistencePort eventPersistencePort;
   private final UserPersistencePort userPersistencePort;
   private final UserPersistenceMapper userPersistenceMapper;
 
-  @AuditAnnotation(action = "CREATE", entityName = "event", entityId = "#event.id", userId = "#event.userId")
   @Override
   public Event createEvent(Event event) {
     log.info("Create event: {}", event);
@@ -67,7 +63,6 @@ public class EventService implements EventInputPort {
     return eventPersistencePort.update(event, eventId);
   }
 
-  @AuditAnnotation(action = "GET", entityName = "event", entityId = "#eventId", userId = "SYSTEM")
   @Override
   public Event findById(String eventId) {
     log.info("Searching event: {}", eventId);

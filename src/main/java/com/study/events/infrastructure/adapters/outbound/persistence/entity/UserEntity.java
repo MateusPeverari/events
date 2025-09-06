@@ -29,7 +29,6 @@ public class UserEntity extends AuditingEntity {
   @Column(name = "email")
   private String email;
 
-  @CPF(message = "CPF inválido")
   @Column(name = "CPF", unique = true)
   private String CPF;
 
