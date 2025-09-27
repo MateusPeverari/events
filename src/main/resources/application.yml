@@ -1,0 +1,111 @@
+spring:
+  application:
+    name: events
+  doc:
+    swagger-ui:
+      url: /openapi.yml
+
+server:
+  port: 8080
+  shutdown: graceful
+  connection-timeout: 5s
+  tomcat:
+    accept-count: 1000
+    max-threads: 200
+    max-connections: 20000
+    keep-alive-timeout: 20s
+    max-keep-alive-requests: 10000
+    accesslog:
+      enabled: false
+    mbeanregistry:
+      enabled: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  mvc:
+    async:
+      request-timeout: 30s
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/events_db}
+    driver-class-name: org.postgresql.Driver
+    username: ${SPRING_DATASOURCE_USERNAME:events_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:events_pass}
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      pool-name: HikariPool-Events
+      maximum-pool-size: 24
+      minimum-idle: 8
+      auto-commit: false
+      idle-timeout: 120000       # 2m
+      max-lifetime: 1800000      # 30m
+      connection-timeout: 5000   # 5s
+      validation-timeout: 2000   # 2s
+      keepalive-time: 300000     # 5m
+      initialization-fail-timeout: 0
+      register-mbeans: true
+      connection-test-query: SELECT 1
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+          time_zone: UTC
+          batch_size: 50
+        connection:
+          provider_disables_autocommit: true
+        order_inserts: true
+        order_updates: true
+        default_batch_fetch_size: 50
+        generate_statistics: false
+
+  task:
+    execution:
+      thread-name-prefix: async-exec-
+      pool:
+        core-size: 16
+        max-size: 32
+        queue-capacity: 5000
+        keep-alive: 60s
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+    org.zalando.logbook: OFF
+  file:
+    path: /app/logs
+  logback:
+    rollingpolicy:
+      file-name-pattern: ${logging.file.path}/events-%d{yyyy-MM-dd}.%i.log.gz
+      max-file-size: 50MB
+      total-size-cap: 5GB
+      max-history: 7
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.5, 0.9, 0.99
