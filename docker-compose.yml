@@ -8,6 +8,7 @@ services:
       POSTGRES_DB: events_db
       POSTGRES_USER: events_user
       POSTGRES_PASSWORD: events_pass
+      PGDATA: /var/lib/postgresql/data/pgdata
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
       interval: 5s
