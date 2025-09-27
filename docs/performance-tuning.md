@@ -64,7 +64,9 @@ Applied through the Compose command block:
 
 Additional operational improvements:
 
-- `tmpfs` mounts for `pg_stat_tmp` and `pg_tmp` eliminate slow disk I/O for transient stats/sort spill files.
+- `tmpfs` mounts for `pg_stat_tmp` and `pg_tmp` eliminate slow disk I/O for transient stats/sort spill files. The database datadir
+  lives under `/var/lib/postgresql/data/pgdata`, which keeps the named Docker volume root (with its `lost+found` entry) outside of
+  PostgreSQL's initialization path.
 - `shm_size: '2gb'` lifts the default SHM cap so `shared_buffers` can be satisfied.
 - Health checks ensure the application only starts after PostgreSQL is accepting connections.
 

@@ -7,6 +7,7 @@ services:
       POSTGRES_DB: events_db
       POSTGRES_USER: events_user
       POSTGRES_PASSWORD: events_pass
+      PGDATA: /var/lib/postgresql/data/pgdata
       TZ: UTC
     command:
       - postgres
@@ -45,8 +46,8 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     tmpfs:
-      - /var/lib/postgresql/data/pg_stat_tmp
-      - /var/lib/postgresql/data/pg_tmp:size=2048m
+      - /var/lib/postgresql/data/pgdata/pg_stat_tmp
+      - /var/lib/postgresql/data/pgdata/pg_tmp:size=2048m
     shm_size: '2gb'
     mem_limit: 12g
     mem_reservation: 8g
