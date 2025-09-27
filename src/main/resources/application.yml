@@ -23,6 +23,7 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
       validation-timeout: 3000
+      initialization-fail-timeout: -1
       connection-test-query: SELECT 1
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
