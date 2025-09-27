@@ -17,7 +17,7 @@ The application container uses Eclipse Temurin 21 with the options baked into th
 | --- | --- | --- |
 | `-Xms8g -Xmx8g` | Fixed 8 GB heap within a 10 GB container limit, leaving headroom for metaspace, threads, buffers, and the OS. |
 | `-Xss512k` | Smaller thread stacks maximize the number of Tomcat and async threads while avoiding stack overflows (validated for typical Spring stack depths). |
-| `-XX:+UseG1GC` with G1 tuning (`G1HeapRegionSize=16m`, `MaxGCPauseMillis=200`, `InitiatingHeapOccupancyPercent=30`, `G1ReservePercent=20`, `G1NewSizePercent=20`, `G1MaxNewSizePercent=60`) | Optimized for large heaps with predictable pause times under sustained traffic. |
+| `-XX:+UseG1GC` with G1 tuning (`G1HeapRegionSize=16m`, `MaxGCPauseMillis=200`, `InitiatingHeapOccupancyPercent=30`, `G1ReservePercent=20`, `-XX:+UnlockExperimentalVMOptions`, `G1NewSizePercent=20`, `G1MaxNewSizePercent=60`) | Optimized for large heaps with predictable pause times under sustained traffic. |
 | `-XX:+ParallelRefProcEnabled`, `-XX:+UseStringDeduplication` | Reduce reference processing and duplicate string overhead when handling many concurrent requests. |
 | `-XX:+AlwaysPreTouch` | Pre-touches pages during startup to eliminate runtime major faults when the heap grows under load. |
 | Failure diagnostics (`-XX:+ExitOnOutOfMemoryError`, `-XX:+HeapDumpOnOutOfMemoryError`, `-XX:HeapDumpPath=/app/logs`, `-XX:ErrorFile=/app/logs/hs_err_pid%p.log`) | Guarantees quick fail-fast and captures heap/HS_ERR logs for triage. |
