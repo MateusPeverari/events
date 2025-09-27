@@ -1,9 +1,9 @@
-version: '3.8'
+version: "3.9"
+
 services:
   db:
     image: postgres:16
-    command: ["-c", "config_file=/etc/postgresql/postgresql.conf"]
-    shm_size: 4g
+    container_name: postgres
     environment:
       POSTGRES_DB: events_db
       POSTGRES_USER: events_user
@@ -12,42 +12,65 @@ services:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
-    tmpfs:
-      - /var/lib/postgresql/data/pg_stat_tmp
-      - /var/lib/postgresql/data/pg_wal
-    cpus: "2"
-    mem_limit: "12g"
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
-    sysctls:
-      net.core.somaxconn: "4096"
-      net.ipv4.tcp_tw_reuse: "1"
-    networks:
-      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 12g
+    command: >
+      postgres
+      -c shared_buffers=3GB
+      -c effective_cache_size=8GB
+      -c work_mem=32MB
+      -c maintenance_work_mem=1GB
+      -c max_connections=50
+      -c wal_compression=on
+      -c max_wal_size=8GB
+      -c min_wal_size=1GB
+      -c checkpoint_timeout=15min
+      -c checkpoint_completion_target=0.9
+      -c autovacuum_vacuum_scale_factor=0.05
+      -c autovacuum_analyze_scale_factor=0.02
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c synchronous_commit=on
+
   app:
     build: .
+    container_name: events-app
     ports:
       - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/events_db
       SPRING_DATASOURCE_USERNAME: events_user
       SPRING_DATASOURCE_PASSWORD: events_pass
+      JAVA_OPTS: >-
+        -Xms3g -Xmx3g
+        -XX:InitialRAMPercentage=60
+        -XX:MaxRAMPercentage=60
+        -XX:+UseG1GC
+        -XX:MaxGCPauseMillis=200
+        -XX:+ParallelRefProcEnabled
+        -XX:+UseStringDeduplication
+        -XX:+AlwaysPreTouch
+        -Xss512k
+        -XX:+ExitOnOutOfMemoryError
+        -XX:+HeapDumpOnOutOfMemoryError
+        -XX:HeapDumpPath=/app/logs
+        -XX:ErrorFile=/app/logs/hs_err_pid%p.log
+        -Xlog:gc*:file=/app/logs/gc.log:time,uptime,level,tags:filecount=5,filesize=10M
     depends_on:
       - db
-    cpus: "2"
-    mem_limit: "10g"
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 10g
     ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
-    sysctls:
-      net.core.somaxconn: "4096"
-      net.ipv4.tcp_tw_reuse: "1"
-    networks:
-      - backend
+      nofile: 1048576
+    volumes:
+      - app-logs:/app/logs
+
   prometheus:
     image: prom/prometheus:v2.44.0
     container_name: prometheus
@@ -55,8 +78,12 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    networks:
-      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1g
+
   grafana:
     image: grafana/grafana:9.5.2
     container_name: grafana
@@ -67,10 +94,12 @@ services:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     depends_on:
       - prometheus
-    networks:
-      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1g
+
 volumes:
-  postgres-data:
-networks:
-  backend:
-    driver: bridge
+  postgres-data: {}
+  app-logs: {}

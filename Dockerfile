@@ -8,5 +8,22 @@ RUN ./mvnw -B package -DskipTests
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+RUN mkdir -p /app/logs
+ENV JAVA_OPTS="\
+ -Xms3g -Xmx3g \
+ -XX:InitialRAMPercentage=60 \
+ -XX:MaxRAMPercentage=60 \
+ -XX:+UseG1GC \
+ -XX:MaxGCPauseMillis=200 \
+ -XX:+ParallelRefProcEnabled \
+ -XX:+UseStringDeduplication \
+ -XX:+AlwaysPreTouch \
+ -Xss512k \
+ -XX:+ExitOnOutOfMemoryError \
+ -XX:+HeapDumpOnOutOfMemoryError \
+ -XX:HeapDumpPath=/app/logs \
+ -XX:ErrorFile=/app/logs/hs_err_pid%p.log \
+ -Xlog:gc*:file=/app/logs/gc.log:time,uptime,level,tags:filecount=5,filesize=10M"
+
 EXPOSE 8080
-ENTRYPOINT ["java","-Xms8g","-Xmx8g","-Xss512k","-XX:+UseG1GC","-XX:MaxGCPauseMillis=200","-XX:ParallelGCThreads=4","-XX:ConcGCThreads=2","-XX:InitiatingHeapOccupancyPercent=25","-XX:G1HeapRegionSize=8m","-XX:+AlwaysPreTouch","-XX:+ParallelRefProcEnabled","-XX:+ExplicitGCInvokesConcurrent","-XX:+UseStringDeduplication","-XX:+HeapDumpOnOutOfMemoryError","-XX:HeapDumpPath=/heapdumps","-XX:+ExitOnOutOfMemoryError","-Djava.security.egd=file:/dev/./urandom","-Djdk.attach.allowAttachSelf=true","-jar","/app/app.jar"]
+ENTRYPOINT ["sh","-c","exec java $JAVA_OPTS -jar /app/app.jar"]
