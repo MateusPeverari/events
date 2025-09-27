@@ -8,6 +8,11 @@ services:
       POSTGRES_DB: events_db
       POSTGRES_USER: events_user
       POSTGRES_PASSWORD: events_pass
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     ports:
       - "5432:5432"
     volumes:
@@ -36,7 +41,8 @@ services:
       SPRING_DATASOURCE_USERNAME: events_user
       SPRING_DATASOURCE_PASSWORD: events_pass
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     cpus: "2"
     mem_limit: "10g"
     ulimits:
