@@ -4,27 +4,6 @@ spring:
   doc:
     swagger-ui:
       url: /openapi.yml
-
-server:
-  port: 8080
-  shutdown: graceful
-  connection-timeout: 5s
-  tomcat:
-    accept-count: 1000
-    max-threads: 200
-    max-connections: 20000
-    keep-alive-timeout: 20s
-    max-keep-alive-requests: 10000
-    accesslog:
-      enabled: false
-    mbeanregistry:
-      enabled: true
-  lifecycle:
-    timeout-per-shutdown-phase: 30s
-  mvc:
-    async:
-      request-timeout: 30s
-
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/events_db}
     driver-class-name: org.postgresql.Driver
@@ -73,6 +52,26 @@ server:
         max-size: 32
         queue-capacity: 5000
         keep-alive: 60s
+
+server:
+  port: 8080
+  shutdown: graceful
+  connection-timeout: 5s
+  tomcat:
+    accept-count: 1000
+    max-threads: 200
+    max-connections: 20000
+    keep-alive-timeout: 20s
+    max-keep-alive-requests: 10000
+    accesslog:
+      enabled: false
+    mbeanregistry:
+      enabled: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  mvc:
+    async:
+      request-timeout: 30s
 
 logging:
   level:
