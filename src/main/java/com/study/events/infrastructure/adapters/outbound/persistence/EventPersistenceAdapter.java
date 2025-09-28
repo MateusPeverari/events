@@ -28,7 +28,13 @@ public class EventPersistenceAdapter implements EventPersistencePort {
   @Override
   public Optional<Event> findById(String eventId) {
     var eventOptional = eventRepository.findWithAttendeesListById(UUID.fromString(eventId));
-    log.info("event optional: {}", eventOptional);
+    log.info(
+        "event lookup result for id {}: {}",
+        eventId,
+        eventOptional
+            .map(eventEntity -> eventEntity.getId())
+            .map(UUID::toString)
+            .orElse("not found"));
     return eventOptional.map(eventPersistenceMapper::toEvent);
   }
 
