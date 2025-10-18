@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @AllArgsConstructor
@@ -25,7 +26,11 @@ public class EventService implements EventInputPort {
   private final UserPersistenceMapper userPersistenceMapper;
 
   @Override
+  @Transactional
   public Event createEvent(Event event) {
+    // Wrapping the workflow in a single transaction keeps all database calls on the same
+    // connection, eliminating extra round trips and ensuring we do not hold locks longer than
+    // necessary when many requests try to create events concurrently.
     log.info("Create event: {}", event);
 
     var userOptional = userPersistencePort.findById(event.getOwnerId().toString());
@@ -42,7 +47,10 @@ public class EventService implements EventInputPort {
   }
 
   @Override
+  @Transactional
   public Event updateEvent(Event event, String eventId) {
+    // Using a transactional boundary here prevents multiple threads from interleaving updates to
+    // the same event record, reducing contention and avoiding redundant reloads of the entity.
     log.info("Update event with Id: {}", eventId);
 
     var eventOptional = eventPersistencePort.findById(eventId);
@@ -64,7 +72,10 @@ public class EventService implements EventInputPort {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Event findById(String eventId) {
+    // A read-only transaction allows Hibernate to skip dirty checking, which keeps lookups cheap
+    // even while hundreds of concurrent readers are active.
     log.info("Searching event: {}", eventId);
 
     return eventPersistencePort.findById(eventId)
@@ -72,12 +83,18 @@ public class EventService implements EventInputPort {
   }
 
   @Override
+  @Transactional
   public void deleteEvent(String eventId) {
+    // Running deletes inside a transaction gives the persistence provider a chance to reuse the
+    // same connection that fetched the entity, reducing lock time and improving throughput.
     eventPersistencePort.delete(eventId);
   }
 
   @Override
+  @Transactional
   public int addUserToEvent(String eventId, EventAddUserRequest eventAddUserRequest) {
+    // The attendees counter is sensitive to lost updates; executing the workflow within a single
+    // transaction lets optimistic locking detect conflicts when many users join or leave at once.
     log.info("Adding user " + eventAddUserRequest + " to event" + eventId);
 
     var event = findById(eventId);

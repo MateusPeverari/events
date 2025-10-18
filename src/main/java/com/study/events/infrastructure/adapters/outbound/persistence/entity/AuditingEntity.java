@@ -3,6 +3,7 @@ package com.study.events.infrastructure.adapters.outbound.persistence.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
@@ -31,4 +32,10 @@ public abstract class AuditingEntity {
   @LastModifiedDate
   @Column(name = "last_modified_date", nullable = false)
   private LocalDateTime lastModifiedDate;
+
+  @Version
+  @Column(name = "version", nullable = false)
+  private long version;
+  // The lightweight optimistic lock guards against lost updates when thousands of virtual threads
+  // try to change the same row, while still allowing readers to proceed without blocking.
 }

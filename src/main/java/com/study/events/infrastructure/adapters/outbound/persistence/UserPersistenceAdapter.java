@@ -21,7 +21,9 @@ public class UserPersistenceAdapter implements UserPersistencePort {
 
   @Override
   public User save(User user) {
-    var userEntity = userRepository.saveAndFlush(userPersistenceMapper.toUserEntity(user));
+    // save(...) postpones the flush so that multiple virtual threads can enqueue their inserts
+    // without immediately blocking on the database connection.
+    var userEntity = userRepository.save(userPersistenceMapper.toUserEntity(user));
     return userPersistenceMapper.toUser(userEntity);
   }
 
@@ -38,7 +40,9 @@ public class UserPersistenceAdapter implements UserPersistencePort {
     if (userSavedOptional.isPresent()) {
       var userSaved = userSavedOptional.get();
       user.setId(userSaved.getId());
-      var userEntity = userRepository.saveAndFlush(userPersistenceMapper.toUserEntity(user));
+      // Deferring flush operations gives Hibernate room to coalesce updates, which is especially
+      // helpful when many concurrent profile edits happen at the same time.
+      var userEntity = userRepository.save(userPersistenceMapper.toUserEntity(user));
       return userPersistenceMapper.toUser(userEntity);
     } else {
       throw new UserException(UserErrors.USER_NOT_FOUND);
@@ -47,8 +51,9 @@ public class UserPersistenceAdapter implements UserPersistencePort {
 
   @Override
   public void deleteUser(User user) {
-    userRepository.delete(userPersistenceMapper.toUserEntity(user));
-    userRepository.flush();
+    // Deleting by identifier skips entity reconstruction and shortens the critical section when
+    // multiple virtual threads attempt to purge users concurrently.
+    userRepository.deleteById(user.getId());
   }
 
   @Override

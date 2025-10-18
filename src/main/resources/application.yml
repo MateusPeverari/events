@@ -1,6 +1,9 @@
 spring:
   application:
     name: events
+  threads:
+    virtual:
+      enabled: true # Enable Loom virtual threads globally so request handling scales beyond the limits of platform threads.
   doc:
     swagger-ui:
       url: /openapi.yml
@@ -43,15 +46,6 @@ spring:
         order_updates: true
         default_batch_fetch_size: 50
         generate_statistics: false
-
-  task:
-    execution:
-      thread-name-prefix: async-exec-
-      pool:
-        core-size: 16
-        max-size: 32
-        queue-capacity: 5000
-        keep-alive: 60s
 
 server:
   port: 8080
