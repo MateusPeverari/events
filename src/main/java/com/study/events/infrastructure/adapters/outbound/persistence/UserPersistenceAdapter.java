@@ -42,7 +42,9 @@ public class UserPersistenceAdapter implements UserPersistencePort {
       user.setId(userSaved.getId());
       // Deferring flush operations gives Hibernate room to coalesce updates, which is especially
       // helpful when many concurrent profile edits happen at the same time.
-      var userEntity = userRepository.save(userPersistenceMapper.toUserEntity(user));
+      var userEntityToUpdate = userPersistenceMapper.toUserEntity(user);
+      userEntityToUpdate.setVersion(userSaved.getVersion());
+      var userEntity = userRepository.save(userEntityToUpdate);
       return userPersistenceMapper.toUser(userEntity);
     } else {
       throw new UserException(UserErrors.USER_NOT_FOUND);

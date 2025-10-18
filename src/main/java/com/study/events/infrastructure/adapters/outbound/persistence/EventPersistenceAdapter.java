@@ -49,6 +49,7 @@ public class EventPersistenceAdapter implements EventPersistencePort {
 
       event.setId(eventSaved.getId());
       var eventEntity = eventPersistenceMapper.toEventEntity(event);
+      eventEntity.setVersion(eventSaved.getVersion());
       // Deferring the flush allows multiple updates triggered by concurrent requests to be grouped
       // together, reducing database round trips and increasing throughput.
       eventEntity = eventRepository.save(eventEntity);
