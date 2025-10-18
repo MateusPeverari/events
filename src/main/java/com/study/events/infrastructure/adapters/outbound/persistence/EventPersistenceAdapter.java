@@ -21,7 +21,9 @@ public class EventPersistenceAdapter implements EventPersistencePort {
   public Event save(Event event) {
     var eventEntity = eventPersistenceMapper.toEventEntity(event);
     eventEntity.setOwner(event.getOwner());
-    eventEntity = eventRepository.saveAndFlush(eventEntity);
+    // save(...) avoids the immediate flush and lets Hibernate batch work, which keeps JDBC
+    // connections free for other virtual threads while transactions are still open.
+    eventEntity = eventRepository.save(eventEntity);
     return eventPersistenceMapper.toEvent(eventEntity);
   }
 
@@ -47,7 +49,10 @@ public class EventPersistenceAdapter implements EventPersistencePort {
 
       event.setId(eventSaved.getId());
       var eventEntity = eventPersistenceMapper.toEventEntity(event);
-      eventEntity = eventRepository.saveAndFlush(eventEntity);
+      eventEntity.setVersion(eventSaved.getVersion());
+      // Deferring the flush allows multiple updates triggered by concurrent requests to be grouped
+      // together, reducing database round trips and increasing throughput.
+      eventEntity = eventRepository.save(eventEntity);
 
       return eventPersistenceMapper.toEvent(eventEntity);
     } else {
@@ -57,13 +62,12 @@ public class EventPersistenceAdapter implements EventPersistencePort {
 
   @Override
   public void delete(String eventId) {
-    var eventSavedOptional = findById(eventId);
-    if (eventSavedOptional.isEmpty()) {
+    var uuid = UUID.fromString(eventId);
+    if (!eventRepository.existsById(uuid)) {
       throw new EventException(EventErrors.EVENT_NOT_FOUND);
     }
-    var eventSaved = eventSavedOptional.get();
-    var eventEntity = eventPersistenceMapper.toEventEntity(eventSaved);
-    eventRepository.delete(eventEntity);
-    eventRepository.flush();
+    // Deleting directly by identifier short-circuits entity materialisation, shrinking the amount
+    // of work each concurrent request performs and keeping the persistence context lean.
+    eventRepository.deleteById(uuid);
   }
 }
