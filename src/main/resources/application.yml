@@ -1,30 +1,12 @@
 spring:
   application:
     name: events
+  threads:
+    virtual:
+      enabled: true # Enable Loom virtual threads globally so request handling scales beyond the limits of platform threads.
   doc:
     swagger-ui:
       url: /openapi.yml
-
-server:
-  port: 8080
-  shutdown: graceful
-  connection-timeout: 5s
-  tomcat:
-    accept-count: 1000
-    max-threads: 200
-    max-connections: 20000
-    keep-alive-timeout: 20s
-    max-keep-alive-requests: 10000
-    accesslog:
-      enabled: false
-    mbeanregistry:
-      enabled: true
-  lifecycle:
-    timeout-per-shutdown-phase: 30s
-  mvc:
-    async:
-      request-timeout: 30s
-
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/events_db}
     driver-class-name: org.postgresql.Driver
@@ -65,14 +47,25 @@ server:
         default_batch_fetch_size: 50
         generate_statistics: false
 
-  task:
-    execution:
-      thread-name-prefix: async-exec-
-      pool:
-        core-size: 16
-        max-size: 32
-        queue-capacity: 5000
-        keep-alive: 60s
+server:
+  port: 8080
+  shutdown: graceful
+  connection-timeout: 5s
+  tomcat:
+    accept-count: 1000
+    max-threads: 200
+    max-connections: 20000
+    keep-alive-timeout: 20s
+    max-keep-alive-requests: 10000
+    accesslog:
+      enabled: false
+    mbeanregistry:
+      enabled: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  mvc:
+    async:
+      request-timeout: 30s
 
 logging:
   level:

@@ -16,16 +16,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "Event")
+@ToString(exclude = {"owner", "attendeesList"})
 public class EventEntity extends AuditingEntity {
   @Id
   @Column(name = "id")
